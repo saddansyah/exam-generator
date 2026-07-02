@@ -270,6 +270,7 @@ function OddEvenExam() {
 		return `${m}:${s.toString().padStart(2, "0")}`;
 	};
 
+	// Component
 	const renderContent = () => {
 		switch (search.stage) {
 			case "config":
