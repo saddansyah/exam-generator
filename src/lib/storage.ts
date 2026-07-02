@@ -44,7 +44,7 @@ export function getExamHistory(type: string = "odd-even"): ExamRun[] {
 	const key = getStorageKey(type);
 	try {
 		let raw = localStorage.getItem(key);
-		
+
 		// Migration check: if the type-specific key doesn't exist but the old general key does, migrate it
 		if (!raw && type === "odd-even") {
 			const oldRaw = localStorage.getItem(STORAGE_KEY_PREFIX);
@@ -58,12 +58,18 @@ export function getExamHistory(type: string = "odd-even"): ExamRun[] {
 
 		return raw ? JSON.parse(raw) : [];
 	} catch (e) {
-		console.error(`Failed to parse history for type ${type} from localStorage`, e);
+		console.error(
+			`Failed to parse history for type ${type} from localStorage`,
+			e,
+		);
 		return [];
 	}
 }
 
-export function getExamRun(id: string, type: string = "odd-even"): ExamRun | undefined {
+export function getExamRun(
+	id: string,
+	type: string = "odd-even",
+): ExamRun | undefined {
 	const history = getExamHistory(type);
 	return history.find((run) => run.id === id);
 }
