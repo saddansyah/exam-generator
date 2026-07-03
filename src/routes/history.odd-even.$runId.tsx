@@ -110,7 +110,8 @@ function OddEvenRunDetail() {
 							<div className="mt-1.5 text-2xl font-bold text-primary">
 								<span>{run.totalCorrect}</span>
 								<span className="text-muted-foreground text-sm font-normal">
-									{"/"}{run.totalQuestions}
+									{"/"}
+									{run.totalQuestions}
 								</span>
 							</div>
 						</div>
