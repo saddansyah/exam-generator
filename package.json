@@ -1,5 +1,7 @@
 {
   "name": "exam-generator",
+  "version": "1.0.0",
+  "description": "Client-side exam and cognitive drill generator built with React, TanStack Router, and Tailwind CSS",
   "private": true,
   "type": "module",
   "imports": {

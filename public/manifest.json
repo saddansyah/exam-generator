@@ -1,6 +1,6 @@
 {
-  "short_name": "TanStack App",
-  "name": "Create TanStack App Sample",
+  "short_name": "Exam Generator",
+  "name": "Exam Generator - Client-side Exam and Cognitive Drill Generator",
   "icons": [
     {
       "src": "favicon.ico",
