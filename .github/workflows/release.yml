@@ -1,0 +1,79 @@
+name: release
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  GH_USERNAME: ${{ secrets.PROD_GH_USERNAME }}
+  GH_PAT: ${{ secrets.PROD_GH_PAT }}
+  DOKPLOY_COMPOSE_ID: ${{ secrets.PROD_DOKPLOY_COMPOSE_ID }}
+  DOKPLOY_API_KEY: ${{ secrets.PROD_DOKPLOY_API_KEY }}
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  build-and-push:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ env.GH_USERNAME }}
+        password: ${{ env.GH_PAT }}
+
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build and push release image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64
+        push: true
+        tags: |
+          ghcr.io/saddansyah/exam-generator:${{ github.sha }}
+          ghcr.io/saddansyah/exam-generator:latest
+
+  redeploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Trigger Dokploy App Compose
+      id: dokploy_deploy
+      run: |
+        echo "Triggering deployment to Dokploy with compose ID: ${{ env.DOKPLOY_COMPOSE_ID }}"
+
+        DEPLOY_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -X 'POST' \
+          'https://admin.saddan.in/api/compose.deploy' \
+          -H 'accept: application/json' \
+          -H 'x-api-key: ${{ env.DOKPLOY_API_KEY }}' \
+          -H 'Content-Type: application/json' \
+          -d '{"composeId": "${{ env.DOKPLOY_COMPOSE_ID }}"}')
+
+        echo "Deploy response:"
+        echo "$DEPLOY_RESPONSE" | sed '/HTTP_STATUS:/d'
+
+        DEPLOY_STATUS=$(echo "$DEPLOY_RESPONSE" | grep HTTP_STATUS | cut -d':' -f2)
+        
+        if [ "$DEPLOY_STATUS" = "200" ]; then
+          echo "✅ Deployment triggered successfully on Dokploy."
+        else
+          echo "❌ Failed to trigger Dokploy deploy. Status: $DEPLOY_STATUS"
+          exit 1
+        fi

@@ -1,0 +1,7 @@
+services:
+  web:
+    image: ghcr.io/saddansyah/exam-generator:latest
+    pull_policy: always
+    expose:
+      - 80
+    restart: unless-stopped
