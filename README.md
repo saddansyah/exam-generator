@@ -1,6 +1,8 @@
 # Exam Generator
-
 Client-side exam and cognitive drill generator built with React, TanStack Router, and Tailwind CSS.
+
+## Preview
+![Preview Exam Generator](https://github.com/user-attachments/assets/f06a0ba6-58b1-492b-a0db-0d9d2bb53709)
 
 ## Development
 
